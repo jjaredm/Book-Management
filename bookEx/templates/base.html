@@ -1,0 +1,50 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three-Section Layout</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}" type ="text/css">
+</head>
+<body>
+    <span style="float: right;">
+        {% if user.is_authenticated %}
+           {{ user.username }}
+           <form action="{% url 'logout' %}?next=/" method="post">
+               <button type="submit">
+                   logout
+               </button>
+               {% csrf_token %}
+           </form>
+        {% else %}
+           Not Loggin
+           <a href="{% url 'login' %}?next=/">Login</a>
+        {% endif %}
+    </span>
+
+    <header class="banner">
+        <h1>Website Banner</h1>
+    </header>
+    <div class="container">
+        <nav class="menu">
+            <ul>
+                {% block sidenav %}
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Services</a></li>
+                    <li><a href="#">Contact</a></li>
+                {% endblock sidenav %}
+            </ul>
+        </nav>
+        <main class="content">
+            {% block content %}
+                <h2>Main Content Area</h2>
+                <p>Welcome to the main content section of this page. You can add text, images, or any other elements here.</p>
+            {% endblock content %}
+        </main>
+    </div>
+</body>
+</html>
