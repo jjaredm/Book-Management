@@ -13,3 +13,5 @@ class BookForm(ModelForm):
             'picture',
         ]
 
+class BookSearchForm(forms.Form):
+    query = forms.CharField(label='Search for a book', max_length=100)
