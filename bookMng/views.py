@@ -7,6 +7,7 @@ from .forms import BookForm
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
+from .forms import BookSearchForm
 
 # Create your views here.
 
@@ -100,4 +101,17 @@ class Register(CreateView):
         form.save()
         return HttpResponseRedirect(self.success_url)
 
+def search_book(request):
+    form = BookSearchForm()
+    results = []
 
+    if request.method == 'GET' and 'query' in request.GET:
+        form = BookSearchForm(request.GET)
+        if form.is_valid():
+            search_term = form.cleaned_data['query']
+            results = Book.objects.filter(name__icontains=search_term)
+
+    return render(request, 'bookMng/search_book.html', {'form': form,
+                                                        'results': results,
+                                                        'item_list': MainMenu.objects.all(),
+                                                        })
