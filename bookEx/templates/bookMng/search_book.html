@@ -22,6 +22,8 @@
                 {{ book.name }}
             </a> - ${{ book.price }}
         </li>
+    {% empty %}
+        <li>No results found.</li>
     {% endfor %}
 </ul>
 
