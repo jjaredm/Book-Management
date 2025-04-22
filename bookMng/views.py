@@ -1,28 +1,23 @@
-from django.http import HttpResponse
 from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
 
 from .models import MainMenu
-
 from .models import Book
-
-# Create your views here.
 from .forms import BookForm
-from django.http import HttpResponseRedirect
-
-
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
+from .forms import BookSearchForm
+
+# Create your views here.
 
 
 def index(request):
-    return render(request,
-                  'bookMng/index.html',
+    return render(request, 'bookMng/index.html',
                   {
                       'item_list': MainMenu.objects.all()
                   }
                   )
-
 
 def postbook(request):
     submitted = False
@@ -50,36 +45,27 @@ def postbook(request):
                   }
                   )
 
-
 def displaybooks(request):
-
     books = Book.objects.all()
     for b in books:
         b.pic_path = b.picture.url[14:]
-
-    return render(request,
-                  'bookMng/displaybooks.html',
+    return render(request, 'bookMng/displaybooks.html',
                   {
                       'item_list': MainMenu.objects.all(),
-                      'books': books
+                      'books': books,
                   }
                   )
 
-
 def mybooks(request):
-
     books = Book.objects.filter(username=request.user)
     for b in books:
         b.pic_path = b.picture.url[14:]
-
-    return render(request,
-                  'bookMng/mybooks.html',
+    return render(request, 'bookMng/mybooks.html',
                   {
                       'item_list': MainMenu.objects.all(),
-                      'books': books
+                      'books': books,
                   }
                   )
-
 
 def book_detail(request, book_id):
 
@@ -94,7 +80,6 @@ def book_detail(request, book_id):
                   }
                   )
 
-
 def book_delete(request, book_id):
 
     book = Book.objects.get(id=book_id)
@@ -107,7 +92,6 @@ def book_delete(request, book_id):
                   }
                   )
 
-
 class Register(CreateView):
     template_name = 'registration/register.html'
     form_class = UserCreationForm
@@ -116,3 +100,17 @@ class Register(CreateView):
     def form_valid(self, form):
         form.save()
         return HttpResponseRedirect(self.success_url)
+
+def search_book(request):
+    form = BookSearchForm()
+    results = []
+
+    if request.method == 'GET' and 'query' in request.GET:
+        form = BookSearchForm(request.GET)
+        if form.is_valid():
+            search_term = form.cleaned_data['query']
+            results = Book.objects.filter(name__icontains=search_term)
+
+    return render(request, 'bookMng/search_book.html', {'form': form,
+                                                        'results': results,
+     
