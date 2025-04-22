@@ -20,5 +20,9 @@ class Book(models.Model):
     picture = models.FileField(upload_to='bookEx/static/uploads')
     pic_path = models.CharField(max_length=300)
     username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    favorites = models.ManyToManyField(User, related_name="favorite_books", blank=True)
+
+    def __str__(self):
+        return self.name
 
 
