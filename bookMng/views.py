@@ -120,24 +120,3 @@ def search_book(request):
                                                         'item_list': MainMenu.objects.all(),
                                                         })
 
-def favorites(request):
-    if not MainMenu.objects.filter(link='/favorites/').exists():
-        MainMenu.objects.create(item='Favorites', link='/favorites/')
-
-    favorite_books = []
-    if request.user.is_authenticated:
-        favorite_books = request.user.favorite_books.all()
-
-    return render(request, 'bookMng/favorites.html', {
-        'item_list': MainMenu.objects.all(),
-        'books': favorite_books
-    })
-@login_required
-def toggle_favorite(request, book_id):
-    book = get_object_or_404(Book, id=book_id)
-    if request.user in book.favorites.all():
-        book.favorites.remove(request.user)
-    else:
-        book.favorites.add(request.user)
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-
