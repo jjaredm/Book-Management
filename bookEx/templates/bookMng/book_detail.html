@@ -54,4 +54,10 @@
                 </td>
             </tr>
     </table>
+        <h2>Comments about the book</h2>
+<form method="get">
+    {{ form.as_p }}
+    <input id="comment" type="text" name="comment" value="{{ comment }}">
+    <button type="submit">Post comment</button>
+</form>
 {% endblock content %}
