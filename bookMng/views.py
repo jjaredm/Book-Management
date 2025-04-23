@@ -108,19 +108,27 @@ class Register(CreateView):
         return HttpResponseRedirect(self.success_url)
 
 def search_book(request):
-    form = BookSearchForm()
-    results = []
+    form = BookSearchForm(request.GET or None)
+    results = Book.objects.none()  # Start with no results
 
-    if request.method == 'GET' and 'query' in request.GET:
-        form = BookSearchForm(request.GET)
-        if form.is_valid():
-            search_term = form.cleaned_data['query']
-            results = Book.objects.filter(name__icontains=search_term)
+    if form.is_valid():
+        search_term = form.cleaned_data.get('query')
+        genre = form.cleaned_data.get('genre')
 
-    return render(request, 'bookMng/search_book.html', {'form': form,
-                                                        'results': results,
-                                                        'item_list': MainMenu.objects.all(),
-                                                        })
+        if search_term or genre:
+            results = Book.objects.all()
+            if search_term:
+                results = results.filter(name__icontains=search_term)
+            if genre:
+                results = results.filter(genre=genre)
+
+    return render(request, 'bookMng/search_book.html', {
+        'form': form,
+        'results': results,
+        'item_list': MainMenu.objects.all(),
+    })
+
+
 
 def favorites(request):
     if not MainMenu.objects.filter(link='/favorites/').exists():

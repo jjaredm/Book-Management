@@ -17,6 +17,7 @@
             <th>Book Name</th>
             <th>Book Price</th>
             <th>Book Web</th>
+            <th>Genre</th>
             <th>Favorites</th>
         </tr>
         {% for book in books %}
@@ -30,14 +31,15 @@
                 <td>
                     <img src="{% static book.pic_path %}" width="100" />
                 </td>
+                <td>{{ book.genre }}</td>
                 <td>
                     <form method="post" action="{% url 'toggle_favorite' book.id %}">
                         {% csrf_token %}
-                        <button type="submit">
+                        <button type="submit" style="background-color: white; border: 1px solid #ccc;">
                             {% if user in book.favorites.all %}
-                                ★ Unfavorite
+                                <span style="color: red;">★</span> Unfavorite
                             {% else %}
-                                ☆ Favorite
+                                <span style="color: gold;">★</span> Favorite
                             {% endif %}
                         </button>
                     </form>

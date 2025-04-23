@@ -22,6 +22,16 @@ class Book(models.Model):
     username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     favorites = models.ManyToManyField(User, related_name="favorite_books", blank=True)
 
+    Genre_Choices = [
+        ('Fiction', 'Fiction'),
+        ('Nonfiction', 'Nonfiction'),
+        ('Mystery', 'Mystery'),
+        ('Fantasy', 'Fantasy'),
+        ('Other', 'Other'),
+    ]
+
+    genre = models.CharField(max_length=50, choices=Genre_Choices, default='Other')
+
     def __str__(self):
         return self.name
 

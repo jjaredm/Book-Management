@@ -11,7 +11,7 @@
 {% endblock sidenav %}
 
 {% block content %}
-    <h1>Display Books</h1>
+    <h1>Favorites</h1>
     <table border="2">
         <tr>
           <th>
@@ -23,6 +23,9 @@
           <th>
             Book Web
           </th>
+          <td>
+                Genre
+          </td>
           <th>
            Remove from favorites
           </th>
@@ -37,6 +40,20 @@
                 </td>
                 <td>
                     <img src="{% static book.pic_path %}" width="100" />
+                </td>
+                <td>
+                    {{ book.genre }}
+                </td>
+
+                <td>
+                    <form method="post" action="{% url 'toggle_favorite' book.id %}">
+                        {% csrf_token %}
+                        <button type="submit" style="background-color: white; border: 1px solid #ccc;">
+                            {% if user in book.favorites.all %}
+                                <span style="color: red;">★</span> Unfavorite
+                            {% endif %}
+                        </button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}
