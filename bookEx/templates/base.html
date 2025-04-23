@@ -20,8 +20,10 @@
                     {% csrf_token %}
                     <button class="dropdown-action" type="submit">Logout</button>
                 </form>
-                <a href="#">Profile Info</a>
-                <a href="#">Inbox</a>
+                <a href="x">Profile Info</a>
+                <a href="x">Inbox</a>
+                <a href="{% url 'users' %}">Community Users</a>
+
             {% else %}
                 <a href="{% url 'login' %}?next=/">Login</a>
                 <a href="{% url 'register' %}">Create Account</a>

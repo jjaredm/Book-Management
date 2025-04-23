@@ -11,6 +11,9 @@ from .forms import BookSearchForm
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+
+from django.contrib.auth.models import User
+
 from django.urls import reverse
 
 
@@ -61,7 +64,7 @@ def displaybooks(request):
                       'books': books,
                   }
                   )
-
+@login_required
 def mybooks(request):
     books = Book.objects.filter(username=request.user)
     for b in books:
@@ -153,3 +156,15 @@ def toggle_favorite(request, book_id):
     else:
         book.favorites.add(request.user)
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+
+
+@login_required
+def users(request):
+    users = User.objects.exclude(id=request.user.id)
+    return render(request, 'bookMng/users.html', {
+        'item_list': MainMenu.objects.all(),
+        'users': users
+    })
+
