@@ -10,20 +10,25 @@
     <link rel="stylesheet" href="{% static 'base.css' %}" type ="text/css">
 </head>
 <body>
-    <span style="float: right;">
-        {% if user.is_authenticated %}
-           {{ user.username }}
-           <form action="{% url 'logout' %}?next=/" method="post">
-               <button type="submit">
-                   logout
-               </button>
-               {% csrf_token %}
-           </form>
-        {% else %}
-           Not Loggin
-           <a href="{% url 'login' %}?next=/">Login</a>
-        {% endif %}
-    </span>
+
+   <div class="profile-dropdown">
+        <button class="profile-btn" onclick="toggleDropdown()">Profile ▼</button>
+        <div id="dropdown-content" class="dropdown-content">
+            {% if user.is_authenticated %}
+                <span class="dropdown-user">Hi, {{ user.username }}</span>
+                <form action="{% url 'logout' %}?next=/" method="post">
+                    {% csrf_token %}
+                    <button class="dropdown-action" type="submit">Logout</button>
+                </form>
+                <a href="#">Profile Info</a>
+                <a href="#">Inbox</a>
+            {% else %}
+                <a href="{% url 'login' %}?next=/">Login</a>
+                <a href="{% url 'register' %}">Create Account</a>
+            {% endif %}
+        </div>
+    </div>
+
 
     <header class="banner">
         <h1>CSULA Library</h1>
@@ -46,5 +51,23 @@
             {% endblock content %}
         </main>
     </div>
+    <script>
+        function toggleDropdown() {
+            const dropdown = document.getElementById("dropdown-content");
+            dropdown.classList.toggle("show");
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile-btn')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    const openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>

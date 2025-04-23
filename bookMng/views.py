@@ -137,11 +137,14 @@ def favorites(request):
     favorite_books = []
     if request.user.is_authenticated:
         favorite_books = request.user.favorite_books.all()
+        for b in favorite_books:
+            b.pic_path = b.picture.url[14:]  # Add this line
 
     return render(request, 'bookMng/favorites.html', {
         'item_list': MainMenu.objects.all(),
         'books': favorite_books
     })
+
 @login_required
 def toggle_favorite(request, book_id):
     book = get_object_or_404(Book, id=book_id)
