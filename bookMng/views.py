@@ -19,7 +19,7 @@ from django.urls import reverse
 
 
 # Create your views here.
-#testing123
+#test
 
 
 def index(request):
