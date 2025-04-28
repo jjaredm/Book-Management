@@ -12,11 +12,7 @@ urlpatterns = [
     path('favorites/', views.favorites, name='favorites'),
     path('favorite/<int:book_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('users/', views.users, name='users'),
-
-
-
-
-
+    path('book/<int:book_id>/comment/', views.add_comment, name='add_comment'),
 
 ]
 

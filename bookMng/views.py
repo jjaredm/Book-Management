@@ -11,8 +11,10 @@ from .forms import BookSearchForm
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 
 from django.contrib.auth.models import User
+from .models import Comment
 
 from django.urls import reverse
 
@@ -78,17 +80,36 @@ def mybooks(request):
                   )
 
 def book_detail(request, book_id):
-
     book = Book.objects.get(id=book_id)
     book.pic_path = book.picture.url[14:]
+    comments = book.comments.all()
 
     return render(request,
-                  'bookMng/book_detail.html',
-                  {
-                      'item_list': MainMenu.objects.all(),
-                      'book': book
-                  }
-                  )
+                'bookMng/book_detail.html',
+                {
+                    'item_list': MainMenu.objects.all(),
+                    'book': book,
+                    'comments': comments
+                }
+                )
+
+
+@login_required
+def add_comment(request, book_id):
+    if request.method == 'POST':
+        book = get_object_or_404(Book, id=book_id)
+        text = request.POST.get('text')
+
+        if text:
+            Comment.objects.create(
+                book=book,
+                user=request.user,
+                text=text
+            )
+
+        return redirect('book_detail', book_id=book_id)
+    return redirect('book_detail', book_id=book_id)
+
 
 def book_delete(request, book_id):
 
