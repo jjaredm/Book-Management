@@ -5,11 +5,14 @@
 
 {% block sidenav %}
    {% for item in item_list %}
-      <li>
-          <a href="{{ item.link }}"> {{ item.item }} </a>
-      </li>
-
-   {% endfor %}
+        {% if item.item == "Favorites" or item.item == "My Books" or item.item == "My Shopping Cart" %}
+            {% if user.is_authenticated %}
+                <li><a href="{{ item.link }}">{{ item.item }}</a></li>
+            {% endif %}
+        {% else %}
+            <li><a href="{{ item.link }}">{{ item.item }}</a></li>
+        {% endif %}
+    {% endfor %}
 {% endblock sidenav %}
 
 {% block content %}

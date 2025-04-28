@@ -4,9 +4,13 @@
 
 {% block sidenav %}
     {% for item in item_list %}
-        <li>
-            <a href="{{ item.link }}"> {{ item.item }} </a>
-        </li>
+        {% if item.item == "Favorites" or item.item == "My Books" or item.item == "My Shopping Cart" %}
+            {% if user.is_authenticated %}
+                <li><a href="{{ item.link }}">{{ item.item }}</a></li>
+            {% endif %}
+        {% else %}
+            <li><a href="{{ item.link }}">{{ item.item }}</a></li>
+        {% endif %}
     {% endfor %}
 {% endblock sidenav %}
 
@@ -18,7 +22,11 @@
             <th>Book Price</th>
             <th>Book Web</th>
             <th>Genre</th>
-            <th>Favorites</th>
+            {% if user.is_authenticated %}
+                <th>Favorites</th>
+            {% endif %}
+
+
         </tr>
         {% for book in books %}
             <tr>
@@ -32,6 +40,7 @@
                     <img src="{% static book.pic_path %}" width="100" />
                 </td>
                 <td>{{ book.genre }}</td>
+                {% if user.is_authenticated %}
                 <td>
                     <form method="post" action="{% url 'toggle_favorite' book.id %}">
                         {% csrf_token %}
@@ -47,6 +56,7 @@
                 <td>
                     <a href="{% url 'add_to_cart' book.id %}" class="cart-button">Add to Cart</a>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>

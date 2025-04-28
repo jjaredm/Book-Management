@@ -138,9 +138,6 @@ def search_book(request):
 
 
 def favorites(request):
-    if not MainMenu.objects.filter(link='/favorites/').exists():
-        MainMenu.objects.create(item='Favorites', link='/favorites/')
-
     favorite_books = []
     if request.user.is_authenticated:
         favorite_books = request.user.favorite_books.all()
