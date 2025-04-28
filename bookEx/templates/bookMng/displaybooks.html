@@ -44,6 +44,9 @@
                         </button>
                     </form>
                 </td>
+                <td>
+                    <a href="{% url 'add_to_cart' book.id %}" class="cart-button">Add to Cart</a>
+                </td>
             </tr>
         {% endfor %}
     </table>
