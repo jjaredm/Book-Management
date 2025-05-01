@@ -49,3 +49,16 @@ class CartItem(models.Model):
         return f"{self.quantity} x {self.book.name}"
 
 
+class Comment(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    text = models.TextField()
+    rating = models.PositiveSmallIntegerField(default=5, choices=[(i, i) for i in range(1, 6)])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def display_user(self):
+        return self.user.username if self.user else "Anonymous"
+
+    def __str__(self):
+        return f"{self.display_user()} - {self.rating}★"
+

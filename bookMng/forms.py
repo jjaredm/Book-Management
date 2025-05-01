@@ -1,6 +1,8 @@
 from django import forms
 from django.forms import ModelForm
 from .models import Book
+from .models import Comment
+
 
 class BookForm(forms.ModelForm):
     class Meta:
@@ -39,3 +41,13 @@ class BookSearchForm(forms.Form):
         required=False,
         label='Genre'
     )
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text', 'rating']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'rating': forms.RadioSelect()
+        }

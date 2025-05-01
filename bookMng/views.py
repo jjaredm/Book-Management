@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.edit import CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse, reverse_lazy
+from .models import Comment
+from .forms import CommentForm
 
 from .models import Book, MainMenu, CartItem
 from .forms import BookForm, BookSearchForm
@@ -57,9 +59,24 @@ def mybooks(request):
 
 def book_detail(request, book_id):
     book = get_object_or_404(Book, id=book_id)
+    comments = book.comments.order_by('-created_at')
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.book = book
+            comment.user = request.user if request.user.is_authenticated else None
+            comment.save()
+            return redirect('book_detail', book_id=book.id)
+    else:
+        form = CommentForm()
+
     return render(request, 'bookMng/book_detail.html', {
         'item_list': MainMenu.objects.all(),
-        'book': book
+        'book': book,
+        'form': form,
+        'comments': comments,
     })
 
 

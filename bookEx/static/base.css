@@ -108,3 +108,31 @@ body {
 .dropdown-content.show {
     display: block;
 }
+
+.stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+.stars input[type="radio"] {
+  display: none;
+}
+
+.stars label {
+  font-size: 2rem;
+  color: lightgray;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.stars label:hover,
+.stars label:hover ~ label {
+  color: gold;
+}
+
+.stars input[type="radio"]:checked + label,
+.stars input[type="radio"]:checked + label ~ label {
+  color: gold;
+}
+

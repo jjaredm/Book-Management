@@ -1,67 +1,72 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block sidenav %}
-    {% for item in item_list %}
-        {% if item.item == "Favorites" or item.item == "My Books" or item.item == "My Shopping Cart" %}
-            {% if user.is_authenticated %}
-                <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-            {% endif %}
-        {% else %}
-            <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-        {% endif %}
-    {% endfor %}
-{% endblock sidenav %}
-
 {% block content %}
-    <h1>Book Detail</h1>
-    <table border="2">
-            <tr>
-                <th>
-                    Book Name
-                </th>
-                <th>
-                    Book Price
-                </th>
-                <th>
-                    Book Web
-                </th>
-                <th>
-                    User Name
-                </th>
-                <th>
-                    Book Post Date
-                </th>
-                <th>
-                    Book Picture
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    {{ book.name }}
-                </td>
-                <td>
-                    ${{ book.price }}
-                </td>
-                <td>
-                    {{ book.web }}
-                </td>
-                <td>
-                    {{ book.username }}
-                </td>
-                <td>
-                    {{ book.publishdate }}
-                </td>
-                <td>
-                    <img src="{{ book.picture.url }}" width="100" />
-                </td>
-            </tr>
-    </table>
-        <h2>Comments about the book</h2>
-<form method="get">
-    {{ form.as_p }}
-    <input id="comment" type="text" name="comment" value="{{ comment }}">
-    <button type="submit">Post comment</button>
-</form>
-{% endblock content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ book.picture.url }}" class="card-img-top" alt="{{ book.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.name }}</h5>
+                    <p><strong>Author:</strong> {{ book.author }}</p>
+                    <p><strong>Price:</strong> ${{ book.price }}</p>
+                    <p><strong>Website:</strong> <a href="{{ book.web }}" target="_blank">{{ book.web }}</a></p>
+                    <p><strong>Posted by:</strong> {{ book.username|default:"Anonymous" }}</p>
+                    <p><strong>Date:</strong> {{ book.publishdate }}</p>
+                    <p><strong>Description:</strong> {{ book.description }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5 class="mb-3">Leave a Comment</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.text.label_tag }}
+                        {{ form.text }}
+                    </div>
+                    <div class="mb-3">
+                        <label><strong>Rating:</strong></label><br>
+                        <div class="stars">
+                            {% for i in "54321" %}
+                                <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" {% if form.rating.value == i %}checked{% endif %}>
+                                <label for="star{{ i }}">★</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post comment</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <h5 class="mb-3">Comments</h5>
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <strong>{{ comment.display_user }}</strong>
+                            <small class="text-muted">on {{ comment.created_at|date:"M d, Y" }}</small><br>
+                            <div>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= comment.rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <p class="mb-0 mt-1">{{ comment.text }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No comments yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
