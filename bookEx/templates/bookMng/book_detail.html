@@ -54,7 +54,7 @@
                     {{ book.publishdate }}
                 </td>
                 <td>
-                    <img src="{% static book.pic_path %}" width="100" />
+                    <img src="{{ book.picture.url }}" width="100" />
                 </td>
             </tr>
     </table>

@@ -14,11 +14,16 @@ class MainMenu(models.Model):
 
 class Book(models.Model):
     name = models.CharField(max_length=200)
+    author = models.CharField(max_length=100, blank=True)
+    publisher = models.CharField(max_length=100, blank=True)
+    year = models.PositiveIntegerField(blank=True, null=True)
+    isbn = models.CharField(max_length=20, blank=True)
+    description = models.TextField(blank=True)
+
     web = models.URLField(max_length=300)
     price = models.DecimalField(decimal_places=2, max_digits=8)
     publishdate = models.DateField(auto_now=True)
-    picture = models.FileField(upload_to='bookEx/static/uploads')
-    pic_path = models.CharField(max_length=300)
+    picture = models.ImageField(upload_to='uploads/')
     username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     favorites = models.ManyToManyField(User, related_name="favorite_books", blank=True)
 

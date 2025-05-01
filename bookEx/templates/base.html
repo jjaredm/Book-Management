@@ -1,76 +1,78 @@
 {% load static %}
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three-Section Layout</title>
-    <link rel="stylesheet" href="{% static 'base.css' %}" type ="text/css">
+    <title>My Book App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'base.css' %}" type="text/css">
 </head>
 <body>
 
-   <div class="profile-dropdown">
-        <button class="profile-btn" onclick="toggleDropdown()">Profile ▼</button>
-        <div id="dropdown-content" class="dropdown-content">
-            {% if user.is_authenticated %}
-                <span class="dropdown-user">Hi, {{ user.username }}</span>
-                <form action="{% url 'logout' %}?next=/" method="post">
-                    {% csrf_token %}
-                    <button class="dropdown-action" type="submit">Logout</button>
-                </form>
-                <a href="x">Profile Info</a>
-                <a href="x">Inbox</a>
-                <a href="{% url 'users' %}">Community Users</a>
-                <a href="/favorites/">Favorites</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">BookApp</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-            {% else %}
-                <a href="{% url 'login' %}?next=/">Login</a>
-                <a href="{% url 'register' %}">Create Account</a>
-            {% endif %}
+    <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'displaybooks' %}">Books</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'postbook' %}">Post Book</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'search_book' %}">Search</a></li>
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'favorites' %}">Favorites</a></li>
+        {% endif %}
+
+
+      </ul>
+
+      <div class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle text-white" id="profileDropdown" role="button" onclick="toggleDropdown()">Profile</a>
+            <div id="dropdown-content" class="dropdown-menu shadow" style="display: none; right: 0; left: auto;">
+          {% if user.is_authenticated %}
+
+            <h6 class="dropdown-header">Hi, {{ user.username }}</h6>
+            <form action="{% url 'logout' %}?next=/" method="post" class="px-3">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger w-100">Logout</button>
+            </form>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Profile Info</a>
+            <a class="dropdown-item" href="#">Inbox</a>
+            <a class="dropdown-item" href="{% url 'users' %}">Community Users</a>
+            <a class="dropdown-item" href="{% url 'favorites' %}">Favorites</a>
+          {% else %}
+            <a class="dropdown-item" href="{% url 'login' %}">Login</a>
+            <a class="dropdown-item" href="{% url 'register' %}">Create Account</a>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
+</nav>
 
+<div class="container mt-4">
+    {% block content %}
+    {% endblock %}
+</div>
 
-    <header class="banner">
-        <h1>CSULA Library</h1>
-    </header>
-    <div class="container">
-        <nav class="menu">
-            <ul>
-                {% block sidenav %}
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Services</a></li>
-                    <li><a href="#">Contact</a></li>
-                {% endblock sidenav %}
-            </ul>
-        </nav>
-        <main class="content">
-            {% block content %}
-                <h2>Main Content Area</h2>
-                <p>Welcome to the main content section of this page. You can add text, images, or any other elements here.</p>
-            {% endblock content %}
-        </main>
-    </div>
-    <script>
-        function toggleDropdown() {
-            const dropdown = document.getElementById("dropdown-content");
-            dropdown.classList.toggle("show");
-        }
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleDropdown() {
+    const dropdown = document.getElementById("dropdown-content");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+}
+document.addEventListener("click", function(event) {
+    const dropdown = document.getElementById("dropdown-content");
+    if (!event.target.closest(".dropdown")) {
+        dropdown.style.display = "none";
+    }
+});
+</script>
 
-        window.onclick = function(event) {
-            if (!event.target.matches('.profile-btn')) {
-                const dropdowns = document.getElementsByClassName("dropdown-content");
-                for (let i = 0; i < dropdowns.length; i++) {
-                    const openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-    </script>
 </body>
 </html>

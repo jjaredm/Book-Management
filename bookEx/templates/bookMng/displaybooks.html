@@ -1,63 +1,45 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block sidenav %}
-    {% for item in item_list %}
-        {% if item.item == "Favorites" or item.item == "My Books" or item.item == "My Shopping Cart" %}
-            {% if user.is_authenticated %}
-                <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-            {% endif %}
-        {% else %}
-            <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-        {% endif %}
-    {% endfor %}
-{% endblock sidenav %}
-
 {% block content %}
-    <h1>Display Books</h1>
-    <table border="2">
-        <tr>
-            <th>Book Name</th>
-            <th>Book Price</th>
-            <th>Book Web</th>
-            <th>Genre</th>
-            {% if user.is_authenticated %}
-                <th>Favorites</th>
-            {% endif %}
+<div class="container mt-5">
+    <h1 class="mb-4">Display Books</h1>
 
-
-        </tr>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for book in books %}
-            <tr>
-                <td>
-                    <a href="book_detail/{{ book.id }}"> {{ book.name }} </a>
-                </td>
-                <td>
-                    {{ book.price }}
-                </td>
-                <td>
-                    <img src="{% static book.pic_path %}" width="100" />
-                </td>
-                <td>{{ book.genre }}</td>
-                {% if user.is_authenticated %}
-                <td>
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ book.picture.url }}" class="card-img-top" alt="{{ book.name }}" style="height: 250px; object-fit: contain;">
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.name }}</h5>
+                    <p class="card-text">
+                        <strong>Author:</strong> {{ book.username.username }}<br>
+                        <strong>Year:</strong> {{ book.year }}<br>
+                        <strong>Genre:</strong> {{ book.genre }}<br>
+                        <strong>Price:</strong> ${{ book.price }}<br>
+                        <a href="{{ book.web }}" class="text-primary" target="_blank">Website</a>
+                    </p>
+                </div>
+
+                <div class="card-footer d-flex justify-content-between">
                     <form method="post" action="{% url 'toggle_favorite' book.id %}">
                         {% csrf_token %}
-                        <button type="submit" style="background-color: white; border: 1px solid #ccc;">
-                            {% if user in book.favorites.all %}
-                                <span style="color: red;">★</span> Unfavorite
-                            {% else %}
-                                <span style="color: gold;">★</span> Favorite
-                            {% endif %}
-                        </button>
+                        {% if user in book.favorites.all %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Unfavorite</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Favorite</button>
+                        {% endif %}
                     </form>
-                </td>
-                <td>
-                    <a href="{% url 'add_to_cart' book.id %}" class="cart-button">Add to Cart</a>
-                </td>
-                {% endif %}
-            </tr>
+
+                    <form method="post" action="{% url 'add_to_cart' book.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-success">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </table>
-{% endblock content %}
+    </div>
+</div>
+{% endblock %}

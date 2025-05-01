@@ -2,17 +2,35 @@ from django import forms
 from django.forms import ModelForm
 from .models import Book
 
-
-class BookForm(ModelForm):
+class BookForm(forms.ModelForm):
     class Meta:
         model = Book
         fields = [
             'name',
+            'author',
+            'publisher',
+            'year',
+            'isbn',
+            'description',
             'web',
             'price',
-            'genre',
             'picture',
+            'genre',
         ]
+
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'author': forms.TextInput(attrs={'class': 'form-control'}),
+            'publisher': forms.TextInput(attrs={'class': 'form-control'}),
+            'year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'isbn': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'web': forms.URLInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'picture': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'genre': forms.Select(attrs={'class': 'form-control'}),
+        }
+
 
 class BookSearchForm(forms.Form):
     query = forms.CharField(label='Search for a book', max_length=100, required=False)
