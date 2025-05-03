@@ -172,9 +172,14 @@ def users(request):
         'users': users
     })
 
+
 def view_cart(request):
     cart_items = CartItem.objects.filter(user=request.user)
-    total_price = sum(item.book.price * item.quantity for item in cart_items)
+
+    for item in cart_items:
+        item.total_cost = item.book.price * item.quantity
+
+    total_price = sum(item.total_cost for item in cart_items)
 
     item_list = MainMenu.objects.all()
 
@@ -200,3 +205,14 @@ def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
     cart_item.delete()
     return redirect('my_cart')
+
+def update_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
+
+    if request.method == "POST":
+        new_quantity = int(request.POST.get("quantity", 1))
+        cart_item.quantity = max(1, new_quantity)
+        cart_item.save()
+
+    return redirect('my_cart')
+

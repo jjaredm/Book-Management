@@ -1,26 +1,23 @@
 {% extends "base.html" %}
-
 {% load static %}
-
 
 {% block sidenav %}
    {% for item in item_list %}
       <li>
-          <a href="{{ item.link }}"> {{ item.item }} </a>
+          <a href="{{ item.link }}">{{ item.item }}</a>
       </li>
-
    {% endfor %}
 {% endblock sidenav %}
 
 {% block content %}
- <style>
+<style>
     table {
         width: 100%;
         border-collapse: collapse;
     }
     th, td {
         padding: 10px;
-        border: 2px solid black; /* Increase border visibility */
+        border: 2px solid black;
         text-align: center;
     }
     .remove-button {
@@ -30,24 +27,40 @@
         text-decoration: none;
         border-radius: 5px;
     }
+    .quantity-input {
+        width: 50px;
+        text-align: center;
+    }
 </style>
-    <h1>My Shopping Cart</h1>
-    <table>
-        <tr>
-            <th>Book Name</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Remove</th>
-        </tr>
-        {% for cart_item in cart_items %}
-            <tr>
-                <td>{{ cart_item.book.name }}</td>
-                <td>${{ cart_item.book.price }}</td>
-                <td>{{ cart_item.quantity }}</td>
-                <td><a href="{% url 'remove_from_cart' cart_item.id %}" class="remove-button">Remove</a></td>
-            </tr>
-        {% endfor %}
-    </table>
 
-    <h2>Total Price: ${{ total_price }}</h2>
+<h1>My Shopping Cart</h1>
+<table>
+    <tr>
+        <th>Book Name</th>
+        <th>Unit Price</th>
+        <th>Quantity</th>
+        <th>Total Price</th>
+        <th>Remove</th>
+    </tr>
+    {% for cart_item in cart_items %}
+        <tr>
+            <td>{{ cart_item.book.name }}</td>
+            <td>${{ cart_item.book.price }}</td>
+            <td>
+                <form action="{% url 'update_cart' cart_item.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" value="{{ cart_item.quantity }}" min="1" class="quantity-input">
+                    <button type="submit" style="display: none;"></button>
+                </form>
+            </td>
+            <td>${{ cart_item.total_cost }}</td>
+            <td>
+                <a href="{% url 'remove_from_cart' cart_item.id %}" class="remove-button">Remove From Cart</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+<h2>Total Price: ${{ total_price }}</h2>
+
 {% endblock content %}
