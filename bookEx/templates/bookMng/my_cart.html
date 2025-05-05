@@ -1,56 +1,50 @@
-{% extends "base.html" %}
-
-{% load static %}
-
-
-{% block sidenav %}
-   {% for item in item_list %}
-        {% if item.item == "Favorites" or item.item == "My Books" or item.item == "My Shopping Cart" %}
-            {% if user.is_authenticated %}
-                <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-            {% endif %}
-        {% else %}
-            <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-        {% endif %}
-    {% endfor %}
-{% endblock sidenav %}
-
+{% extends 'base.html' %}
 {% block content %}
- <style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th, td {
-        padding: 10px;
-        border: 2px solid black; /* Increase border visibility */
-        text-align: center;
-    }
-    .remove-button {
-        background-color: red;
-        color: white;
-        padding: 5px 10px;
-        text-decoration: none;
-        border-radius: 5px;
-    }
-</style>
-    <h1>My Shopping Cart</h1>
-    <table>
-        <tr>
-            <th>Book Name</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Remove</th>
-        </tr>
-        {% for cart_item in cart_items %}
-            <tr>
-                <td>{{ cart_item.book.name }}</td>
-                <td>${{ cart_item.book.price }}</td>
-                <td>{{ cart_item.quantity }}</td>
-                <td><a href="{% url 'remove_from_cart' cart_item.id %}" class="remove-button">Remove</a></td>
-            </tr>
-        {% endfor %}
-    </table>
+<h3 class="text-center mb-4">Your Cart</h3>
 
-    <h2>Total Price: ${{ total_price }}</h2>
-{% endblock content %}
+{% if cart_items %}
+<div class="row">
+  {% for item in cart_items %}
+  <div class="col-md-4 mb-4">
+    <div class="card h-100">
+      <img src="{{ item.book.picture.url }}" class="card-img-top" style="height: 300px; object-fit: cover;" alt="{{ item.book.name }}">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title text-center">{{ item.book.name }}</h5>
+        <p><strong>Author:</strong> {{ item.book.author }}</p>
+        <p><strong>Genre:</strong> {{ item.book.genre }}</p>
+        <p><strong>Price:</strong> ${{ item.book.price }}</p>
+
+        <form method="POST" action="{% url 'update_cart_item' item.id %}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label for="format_{{ item.id }}"><strong>Format:</strong></label>
+            <select name="format" id="format_{{ item.id }}" class="form-select">
+              <option value="Physical" {% if item.format == 'Physical' %}selected{% endif %}>Physical</option>
+              <option value="Digital" {% if item.format == 'Digital' %}selected{% endif %}>Digital</option>
+              <option value="Audio" {% if item.format == 'Audio' %}selected{% endif %}>Audio</option>
+            </select>
+          </div>
+
+          <div class="mb-2">
+            <label for="quantity_{{ item.id }}"><strong>Quantity:</strong></label>
+            <input type="number" name="quantity" id="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1" class="form-control">
+          </div>
+
+          <button type="submit" class="btn btn-outline-primary w-100 mb-2">Update</button>
+        </form>
+
+        <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-outline-danger w-100">Remove</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="text-center mt-4">
+  <h5>Total Price: ${{ total_price }}</h5>
+  <a href="#" class="btn btn-success mt-2">Proceed to Checkout</a>
+</div>
+{% else %}
+  <p class="text-center text-muted">Your cart is empty.</p>
+{% endif %}
+{% endblock %}

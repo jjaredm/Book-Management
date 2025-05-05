@@ -18,7 +18,7 @@ body {
 
 .container {
     display: flex;
-    height: calc(100vh - 80px); /* Adjusting for banner height */
+    height: calc(100vh - 80px);
 }
 
 .menu {
@@ -135,4 +135,110 @@ body {
 .stars input[type="radio"]:checked + label ~ label {
   color: gold;
 }
+
+.about-container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f9fafb;
+  text-align: center;
+}
+
+.about-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.about-subheading {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 2rem;
+  max-width: 700px;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  max-width: 900px;
+  gap: 2rem;
+  width: 100%;
+}
+
+.team-member {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
+
+.member-name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.member-role {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.carousel-container {
+  width: 400px;
+  margin: 0 auto;
+}
+
+
+.carousel-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.carousel-item img {
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.carousel-caption {
+  text-align: left;
+}
+
+.carousel-inner {
+  position: relative;
+  width: 100%;
+  max-width: 700px; /* adjust this to fit your layout */
+  margin: 0 auto;
+  min-height: 420px; /* keeps consistent vertical height */
+  overflow: hidden;
+}
+
+.carousel-item.active {
+  opacity: 1;
+  z-index: 1;
+  position: relative;
+}
+
+.book-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.book-card-hover:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+
+
+
 

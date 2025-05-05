@@ -1,21 +1,41 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block sidenav %}
-    {% for item in item_list %}
-        {% if item.item == "Favorites" or item.item == "My Books" or item.item == "My Shopping Cart" %}
-            {% if user.is_authenticated %}
-                <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-            {% endif %}
-        {% else %}
-            <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-        {% endif %}
-    {% endfor %}
-{% endblock sidenav %}
-
 {% block content %}
-    <h1>Welcome to CS3337 Exchange Books!</h1>
-    <h2></h2>
-{% endblock content %}
+<div class="d-flex flex-column min-vh-100" style="background-color: #e0f7ff;">
+  <div class="container text-center flex-grow-1 d-flex flex-column justify-content-center py-5">
+    <h1 class="display-4">Welcome to CS3337 Exchange Books</h1>
+    <p class="lead mt-3">Buy, sell, and discover textbooks with your classmates.</p>
+  </div>
 
+  <footer class="text-white mt-auto pt-4 pb-3" style="background-color: #00598C; border-top: 5px solid #FFD100;">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <h4>CS3337 Book Exchange</h4>
+          <p>Stay updated on student-to-student book trades and affordable listings.</p>
+          <div>
+            <a href="#" class="text-white me-3 text-decoration-underline">GitHub</a>
+            <a href="#" class="text-white me-3 text-decoration-underline">Instagram</a>
+            <a href="#" class="text-white me-3 text-decoration-underline">LinkedIn</a>
+            <a href="{% url 'about' %}" class="text-white text-decoration-underline">About Us</a>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <h5>Stay Updated</h5>
+          <form class="d-flex">
+            <input type="email" class="form-control me-2" placeholder="Email Address">
+            <button class="btn btn-light" type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <hr class="border-light">
+      <div class="text-center small">
+        &copy; 2025 CS3337 Book Exchange |
+        <a href="#" class="text-white text-decoration-underline">Privacy</a> ·
+        <a href="#" class="text-white text-decoration-underline">Terms</a>
+      </div>
+    </div>
+  </footer>
+</div>
+{% endblock %}

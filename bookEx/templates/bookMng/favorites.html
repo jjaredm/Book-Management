@@ -1,65 +1,25 @@
-{% extends "base.html" %}
-
-{% load static %}
-
-{% block sidenav %}
-    {% for item in item_list %}
-        {% if item.item == "Favorites" or item.item == "My Books" or item.item == "My Shopping Cart" %}
-            {% if user.is_authenticated %}
-                <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-            {% endif %}
-        {% else %}
-            <li><a href="{{ item.link }}">{{ item.item }}</a></li>
-        {% endif %}
-    {% endfor %}
-{% endblock sidenav %}
-
+{% extends 'base.html' %}
 {% block content %}
-    <h1>Favorites</h1>
-    <table border="2">
-        <tr>
-          <th>
-            Book Name
-          </th>
-          <th>
-            Book Price
-          </th>
-          <th>
-            Book Web
-          </th>
-          <td>
-                Genre
-          </td>
-          <th>
-           Remove from favorites
-          </th>
-        </tr>
-        {% for book in books %}
-            <tr>
-                <td>
-                    <a href="book_detail/{{ book.id }}"> {{ book.name }} </a>
-                </td>
-                <td>
-                    {{ book.price }}
-                </td>
-                <td>
-                    <img src="{{ book.picture.url }}" width="100" />
-                </td>
-                <td>
-                    {{ book.genre }}
-                </td>
+<h3 class="text-center mb-4">Your Favorite Books</h3>
 
-                <td>
-                    <form method="post" action="{% url 'toggle_favorite' book.id %}">
-                        {% csrf_token %}
-                        <button type="submit" style="background-color: white; border: 1px solid #ccc;">
-                            {% if user in book.favorites.all %}
-                                <span style="color: red;">★</span> Unfavorite
-                            {% endif %}
-                        </button>
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-{% endblock content %}
+{% if books %}
+<div class="row">
+  {% for book in books %}
+  <div class="col-md-4 mb-4">
+    <div class="card h-100">
+      <img src="{{ book.picture.url }}" class="card-img-top" style="height: 300px; object-fit: cover;" alt="{{ book.name }}">
+      <div class="card-body">
+        <h5 class="card-title text-center">{{ book.name }}</h5>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Genre:</strong> {{ book.genre }}</p>
+        <p><strong>Price:</strong> ${{ book.price }}</p>
+        <a href="{% url 'book_detail' book.id %}" class="btn btn-primary w-100">View Details</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+  <p class="text-center text-muted">You haven't favorited any books yet.</p>
+{% endif %}
+{% endblock %}

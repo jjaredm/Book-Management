@@ -3,45 +3,106 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Display Books</h1>
+    <div class="mb-3 d-flex flex-column align-items-start" style="margin-left: -150px; margin-right: 50px">
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <span class="fw-bold">Page: {{ books.number }} of {{ books.paginator.num_pages }}</span>
+            {% if books.has_previous %}
+                <a class="btn btn-outline-secondary btn-sm" href="?{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}{% if request.GET.fav %}fav=1&{% endif %}page={{ books.previous_page_number }}">←</a>
+            {% else %}
+                <span class="btn btn-outline-secondary btn-sm disabled">←</span>
+            {% endif %}
+            {% if books.has_next %}
+                <a class="btn btn-outline-secondary btn-sm" href="?{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}{% if request.GET.fav %}fav=1&{% endif %}page={{ books.next_page_number }}">→</a>
+            {% else %}
+                <span class="btn btn-outline-secondary btn-sm disabled">→</span>
+            {% endif %}
+        </div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for book in books %}
-        <div class="col">
-            <div class="card h-100 shadow-sm position-relative">
-                <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit; position: absolute; inset: 0; z-index: 1;"></a>
+        <form method="get" class="d-flex flex-column align-items-start">
+            <label for="sort_by" class="form-label mb-1">Sort by:</label>
+            <select name="sort" id="sort_by" class="form-select form-select-sm mb-2" style="width: auto;" onchange="this.form.submit()">
+                <option value="">-- Choose --</option>
+                <option value="price_asc" {% if request.GET.sort == "price_asc" %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_desc" {% if request.GET.sort == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+                <option value="name" {% if request.GET.sort == "name" %}selected{% endif %}>Name (A–Z)</option>
+                <option value="new" {% if request.GET.sort == "new" %}selected{% endif %}>Newest</option>
+            </select>
 
-                <img src="{{ book.picture.url }}" class="card-img-top" alt="{{ book.name }}" style="height: 250px; object-fit: contain; z-index: 0;">
-
-                <div class="card-body" style="z-index: 2; position: relative;">
-                    <h5 class="card-title">{{ book.name }}</h5>
-                    <p class="card-text">
-                        <strong>Author:</strong> {{ book.username.username }}<br>
-                        <strong>Year:</strong> {{ book.year }}<br>
-                        <strong>Genre:</strong> {{ book.genre }}<br>
-                        <strong>Price:</strong> ${{ book.price }}<br>
-                        <a href="{{ book.web }}" class="text-primary" target="_blank" style="z-index: 3; position: relative;">Website</a>
-                    </p>
+            {% if request.user.is_authenticated %}
+                {% if request.GET.sort %}
+                    <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+                {% endif %}
+                {% if request.GET.page %}
+                    <input type="hidden" name="page" value="{{ request.GET.page }}">
+                {% endif %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="favToggle" name="fav" value="1" onchange="this.form.submit()" {% if request.GET.fav == '1' %}checked{% endif %}>
+                    <label class="form-check-label" for="favToggle">Show Favorites</label>
                 </div>
+            {% endif %}
+        </form>
+    </div>
 
-                <div class="card-footer d-flex justify-content-between" style="z-index: 3; position: relative;">
-                    <form method="post" action="{% url 'toggle_favorite' book.id %}">
-                        {% csrf_token %}
-                        {% if user in book.favorites.all %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Unfavorite</button>
-                        {% else %}
-                        <button type="submit" class="btn btn-sm btn-outline-primary">Favorite</button>
-                        {% endif %}
-                    </form>
+    <div class="position-relative">
+        <div class="row row-cols-2 row-cols-md-3 g-4 justify-content-center">
+            {% for book in books %}
+            <div class="col mb-5">
+                <div class="card h-100 shadow-sm position-relative book-card-hover p-3" style="transform: scale(1.03);">
+                    <a href="{% url 'book_detail' book.id %}" style="text-decoration: none; color: inherit; position: absolute; inset: 0; z-index: 1;"></a>
 
-                    <form method="post" action="{% url 'add_to_cart' book.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-success">Add to Cart</button>
-                    </form>
+                    {% if book.picture %}
+                        <img src="{{ book.picture.url }}" class="card-img-top" alt="{{ book.name }}" style="height: 250px; object-fit: contain; z-index: 0;">
+                    {% else %}
+                        <img src="{% static 'images/no-image.png' %}" class="card-img-top" alt="No image" style="height: 250px; object-fit: contain; z-index: 0;">
+                    {% endif %}
+
+                    <div class="card-body" style="z-index: 2; position: relative;">
+                        <h5 class="card-title">{{ book.name }}</h5>
+                        <p class="card-text"><strong>Author:</strong> {{ book.author }}</p>
+                        <p class="card-text"><strong>Year:</strong> {{ book.year }}</p>
+                        <p class="card-text"><strong>Genre:</strong> {{ book.genre }}</p>
+                        <p class="card-text"><strong>Price:</strong> ${{ book.price }}</p>
+                        <p class="card-text">
+                            <strong>Rating:</strong>
+                            {% with avg=book.avg_rating %}
+                                {% if avg %}
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= avg|floatformat:0 %}
+                                            <span style="color: gold;">★</span>
+                                        {% else %}
+                                            <span style="color: lightgray;">★</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    ({{ avg|floatformat:1 }})
+                                {% else %}
+                                    {% for i in "12345" %}
+                                        <span style="color: lightgray;">★</span>
+                                    {% endfor %}
+                                    (0.0)
+                                {% endif %}
+                            {% endwith %}
+                        </p>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between" style="z-index: 3; position: relative;">
+                        <form method="post" action="{% url 'toggle_favorite' book.id %}">
+                            {% csrf_token %}
+                            {% if user in book.favorites.all %}
+                                <button type="submit" class="btn btn-outline-danger">Unfavorite</button>
+                            {% else %}
+                                <button type="submit" class="btn btn-outline-primary">Favorite</button>
+                            {% endif %}
+                        </form>
+
+                        <form method="post" action="{% url 'add_to_cart' book.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Add to Cart</button>
+                        </form>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}

@@ -17,13 +17,13 @@ class Book(models.Model):
     author = models.CharField(max_length=100, blank=True)
     publisher = models.CharField(max_length=100, blank=True)
     year = models.PositiveIntegerField(blank=True, null=True)
+    pages = models.PositiveIntegerField(blank=True, null=True)
     isbn = models.CharField(max_length=20, blank=True)
     description = models.TextField(blank=True)
 
-    web = models.URLField(max_length=300)
     price = models.DecimalField(decimal_places=2, max_digits=8)
     publishdate = models.DateField(auto_now=True)
-    picture = models.ImageField(upload_to='uploads/')
+    picture = models.ImageField(upload_to='static/uploads/')
     username = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
     favorites = models.ManyToManyField(User, related_name="favorite_books", blank=True)
 
@@ -44,6 +44,7 @@ class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
+    format = models.CharField(max_length=20, default='Unknown')
 
     def __str__(self):
         return f"{self.quantity} x {self.book.name}"
@@ -62,3 +63,9 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.display_user()} - {self.rating}★"
 
+@property
+def average_rating(self):
+    all_ratings = self.ratings.all()  # Assuming related_name='ratings'
+    if all_ratings.exists():
+        return round(sum(r.rating for r in all_ratings) / all_ratings.count(), 1)
+    return 0

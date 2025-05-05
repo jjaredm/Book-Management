@@ -13,12 +13,24 @@ from .models import Book, MainMenu, CartItem
 from .forms import BookForm, BookSearchForm
 
 
+from .models import Book
+
+from django.db.models import Avg
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+from .models import CartItem
+
+
+
 def index(request):
+    top_books = Book.objects.all()[:3]  # Or use custom logic for "top"
     return render(request, 'bookMng/index.html', {
-        'item_list': MainMenu.objects.all()
+        'item_list': MainMenu.objects.all(),
+        'top_books': top_books
     })
 
 
+@login_required()
 def postbook(request):
     submitted = False
     if request.method == 'POST':
@@ -40,12 +52,41 @@ def postbook(request):
     })
 
 
+
 def displaybooks(request):
-    books = Book.objects.all()
+    sort = request.GET.get("sort")
+    show_favorites = request.GET.get("fav") == "1"
+
+    books = Book.objects.annotate(avg_rating=Avg('comments__rating'))
+
+    if show_favorites and request.user.is_authenticated:
+        books = books.filter(favorites=request.user)
+
+    if sort == "price_asc":
+        books = books.order_by("price")
+    elif sort == "price_desc":
+        books = books.order_by("-price")
+    elif sort == "name":
+        books = books.order_by("name")
+    elif sort == "new":
+        books = books.order_by("-publishdate")
+
+    paginator = Paginator(books, 6)
+    page_number = request.GET.get("page")
+
+    try:
+        page_obj = paginator.get_page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
     return render(request, 'bookMng/displaybooks.html', {
         'item_list': MainMenu.objects.all(),
-        'books': books,
+        'books': page_obj,
+        'request': request
     })
+
 
 
 @login_required
@@ -60,6 +101,9 @@ def mybooks(request):
 def book_detail(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     comments = book.comments.order_by('-created_at')
+
+    # Fetch related books by genre (excluding the current book)
+    related_books = Book.objects.filter(genre=book.genre).exclude(id=book.id)[:3]
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -77,7 +121,9 @@ def book_detail(request, book_id):
         'book': book,
         'form': form,
         'comments': comments,
+        'related_books': related_books,  # ← ADD THIS
     })
+
 
 
 def book_delete(request, book_id):
@@ -98,37 +144,20 @@ class Register(CreateView):
         return HttpResponseRedirect(self.success_url)
 
 
-def search_book(request):
-    form = BookSearchForm(request.GET or None)
-    results = Book.objects.none()
 
-    if form.is_valid():
-        search_term = form.cleaned_data.get('query')
-        genre = form.cleaned_data.get('genre')
-
-        if search_term or genre:
-            results = Book.objects.all()
-            if search_term:
-                results = results.filter(name__icontains=search_term)
-            if genre:
-                results = results.filter(genre=genre)
-
-    return render(request, 'bookMng/search_book.html', {
-        'form': form,
+def search_books(request):
+    query = request.GET.get('q')
+    results = Book.objects.filter(name__icontains=query) if query else []
+    return render(request, 'bookMng/search_results.html', {
         'results': results,
-        'item_list': MainMenu.objects.all(),
+        'query': query
     })
 
 
+@login_required
 def favorites(request):
-    favorite_books = []
-    if request.user.is_authenticated:
-        favorite_books = request.user.favorite_books.all()
-
-    return render(request, 'bookMng/favorites.html', {
-        'item_list': MainMenu.objects.all(),
-        'books': favorite_books
-    })
+    books = Book.objects.filter(favorites=request.user)
+    return render(request, 'bookMng/favorites.html', {'books': books})
 
 
 def toggle_favorite(request, book_id):
@@ -165,18 +194,43 @@ def view_cart(request):
 
 def add_to_cart(request, book_id):
     book = get_object_or_404(Book, id=book_id)
-    cart_item, created = CartItem.objects.get_or_create(user=request.user, book=book)
+    format = request.POST.get('format', 'Unknown')  # Get selected format
 
-    if created:
-        cart_item.quantity = 1
-    else:
+    cart_item, created = CartItem.objects.get_or_create(
+        user=request.user,
+        book=book,
+        defaults={'format': format}
+    )
+    if not created:
         cart_item.quantity += 1
-
-    cart_item.save()
+        cart_item.save()
     return redirect('displaybooks')
+
 
 
 def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
     cart_item.delete()
+    return redirect('my_cart')
+
+def about(request):
+    return render(request, 'bookMng/about.html')
+
+
+@login_required
+def update_cart_item(request, item_id):
+    item = get_object_or_404(CartItem, id=item_id, user=request.user)
+
+    if request.method == 'POST':
+        new_format = request.POST.get('format')
+        new_quantity = request.POST.get('quantity')
+
+        if new_format in ['Physical', 'Digital', 'Audio']:
+            item.format = new_format
+
+        if new_quantity.isdigit() and int(new_quantity) > 0:
+            item.quantity = int(new_quantity)
+
+        item.save()
+
     return redirect('my_cart')

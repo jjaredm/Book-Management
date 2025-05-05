@@ -3,76 +3,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Book App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'base.css' %}" type="text/css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Book App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'base.css' %}" type="text/css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">BookApp</a>
+    <a class="navbar-brand" href="{% url 'index' %}">BookApp</a>
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link" href="{% url 'displaybooks' %}">Books</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'postbook' %}">Post Book</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'search_book' %}">Search</a></li>
-        {% if user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'favorites' %}">Favorites</a></li>
-        {% endif %}
-
-
       </ul>
 
-      <div class="nav-item dropdown">
-        <a href="#" class="nav-link dropdown-toggle text-white" id="profileDropdown" role="button" onclick="toggleDropdown()">Profile</a>
-            <div id="dropdown-content" class="dropdown-menu shadow" style="display: none; right: 0; left: auto;">
-          {% if user.is_authenticated %}
+      <form class="d-flex mx-auto" role="search" method="GET" action="{% url 'search_results' %}">
+        <input class="form-control me-2" type="search" name="q" placeholder="Search books..." aria-label="Search">
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
 
-            <h6 class="dropdown-header">Hi, {{ user.username }}</h6>
-            <form action="{% url 'logout' %}?next=/" method="post" class="px-3">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-outline-danger w-100">Logout</button>
-            </form>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Profile Info</a>
-            <a class="dropdown-item" href="#">Inbox</a>
-            <a class="dropdown-item" href="{% url 'users' %}">Community Users</a>
-            <a class="dropdown-item" href="{% url 'favorites' %}">Favorites</a>
-          {% else %}
-            <a class="dropdown-item" href="{% url 'login' %}">Login</a>
-            <a class="dropdown-item" href="{% url 'register' %}">Create Account</a>
-          {% endif %}
-        </div>
+      <div class="d-flex align-items-center">
+        {% if user.is_authenticated %}
+
+          <a href="{% url 'favorites' %}" class="nav-link position-relative me-3">
+            <i class="bi bi-heart-fill" style="font-size: 1.5rem; color: white;"></i>
+            {% if favorite_count > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ favorite_count }}
+              </span>
+            {% endif %}
+          </a>
+
+          <a href="{% url 'my_cart' %}" class="nav-link position-relative me-3">
+            <i class="bi bi-cart" style="font-size: 1.5rem; color: white;"></i>
+            {% if cart_item_count > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                {{ cart_item_count }}
+              </span>
+            {% endif %}
+          </a>
+
+          <div class="nav-item dropdown">
+            <a href="#" class="nav-link dropdown-toggle text-white" id="profileDropdown" role="button" data-bs-toggle="dropdown">
+              Profile
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+              <li class="dropdown-header">Hi, {{ user.username }}</li>
+              <li>
+                <form action="{% url 'logout' %}?next=/" method="post" class="px-3">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger w-100">Logout</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        {% else %}
+          <a class="btn btn-outline-light me-2" href="{% url 'login' %}">Login</a>
+          <a class="btn btn-light" href="{% url 'register' %}">Register</a>
+        {% endif %}
       </div>
     </div>
   </div>
 </nav>
 
 <div class="container mt-4">
-    {% block content %}
-    {% endblock %}
+  {% block content %}
+  {% endblock %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-function toggleDropdown() {
-    const dropdown = document.getElementById("dropdown-content");
-    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-}
-document.addEventListener("click", function(event) {
-    const dropdown = document.getElementById("dropdown-content");
-    if (!event.target.closest(".dropdown")) {
-        dropdown.style.display = "none";
-    }
-});
-</script>
-
 </body>
 </html>

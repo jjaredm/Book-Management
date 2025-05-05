@@ -12,9 +12,9 @@ class BookForm(forms.ModelForm):
             'author',
             'publisher',
             'year',
+            'pages',
             'isbn',
             'description',
-            'web',
             'price',
             'picture',
             'genre',
@@ -47,7 +47,8 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text', 'rating']
-        widgets = {
-            'text': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'rating': forms.RadioSelect()
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['text'].required = False
+        self.fields['rating'].required = False  # This makes rating optional too
