@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="mb-3 d-flex flex-column align-items-start" style="margin-left: -150px; margin-right: 50px">
+    <div class="mb-3 d-flex flex-column align-items-start" style="margin-left: -100px; margin-right: 50px">
         <div class="d-flex align-items-center gap-3 mb-2">
             <span class="fw-bold">Page: {{ books.number }} of {{ books.paginator.num_pages }}</span>
             {% if books.has_previous %}
@@ -43,8 +43,8 @@
         </form>
     </div>
 
-    <div class="position-relative">
-        <div class="row row-cols-2 row-cols-md-3 g-4 justify-content-center">
+    <div class="col">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 justify-content-start">
             {% for book in books %}
             <div class="col mb-5">
                 <div class="card h-100 shadow-sm position-relative book-card-hover p-3" style="transform: scale(1.03);">
